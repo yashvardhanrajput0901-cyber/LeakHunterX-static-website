@@ -3,433 +3,396 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LeakHunterX - SYSTEM BREACH</title>
+    <title>LeakHunterX | Neural Breach Detection</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=VT323&family=Fira+Code:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;500;700&display=swap" rel="stylesheet">
 
     <style>
         :root {
-            --neon-green: #0f0;
-            --dark-bg: #050505;
-        }
-        body {
-            margin: 0;
-            overflow-x: hidden;
-            background: var(--dark-bg);
-            color: var(--neon-green);
-            font-family: 'Fira Code', monospace;
+            --neon-cyan: #00f2ff;
+            --neon-purple: #7000ff;
+            --bg-black: #020205;
         }
 
-        /* The Matrix Rain Canvas */
-        #matrix-canvas {
+        body {
+            background-color: var(--bg-black);
+            color: white;
+            font-family: 'Fira Code', monospace;
+            overflow-x: hidden;
+            margin: 0;
+        }
+
+        /* Ambient Corner Glow */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 0% 0%, rgba(0, 242, 255, 0.08) 0%, transparent 40%),
+                        radial-gradient(circle at 100% 100%, rgba(112, 0, 255, 0.08) 0%, transparent 40%);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        #data-canvas {
             position: fixed;
             top: 0;
             left: 0;
             z-index: 0;
-            opacity: 0.25; 
         }
 
-        /* Scanline Overlay */
-        .scanlines {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: repeating-linear-gradient(
-                to bottom,
-                transparent 0px,
-                transparent 2px,
-                rgba(0, 0, 0, 0.5) 3px,
-                rgba(0, 0, 0, 0.5) 4px
-            );
-            pointer-events: none;
-            z-index: 10;
+        .glass-panel {
+            background: rgba(10, 10, 20, 0.75);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(0, 242, 255, 0.2);
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.8);
         }
 
-        /* Glitch Animation for Title */
-        .glitch-wrapper {
+        /* --- MVP LAUNCH ANIMATION --- */
+        .mvp-container {
             position: relative;
             display: inline-block;
+            padding: 0 10px;
         }
-        .glitch {
+
+        .mvp-text {
+            font-size: 1.2rem;
+            font-weight: 700;
+            letter-spacing: 0.5em;
+            color: rgba(0, 242, 255, 0.3);
             position: relative;
-            color: var(--neon-green);
-            font-size: 3.5rem; 
-            font-weight: bold;
             text-transform: uppercase;
-            letter-spacing: 0.1em;
-            font-family: 'VT323', monospace;
         }
-        @media (min-width: 768px) {
-            .glitch { font-size: 5rem; }
-        }
-        
-        .glitch::before, .glitch::after {
-            content: attr(data-text);
+
+        .mvp-text::after {
+            content: "MVP_LAUNCH_IMMINENT";
             position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: var(--dark-bg);
-        }
-        .glitch::before {
-            left: 2px;
-            text-shadow: -1px 0 red;
-            clip: rect(24px, 550px, 90px, 0);
-            animation: glitch-anim-2 3s infinite linear alternate-reverse;
-        }
-        .glitch::after {
-            left: -2px;
-            text-shadow: -1px 0 blue;
-            clip: rect(85px, 550px, 140px, 0);
-            animation: glitch-anim 2.5s infinite linear alternate-reverse;
-        }
-        @keyframes glitch-anim {
-            0% { clip: rect(14px, 9999px, 122px, 0); }
-            20% { clip: rect(82px, 9999px, 13px, 0); }
-            40% { clip: rect(2px, 9999px, 108px, 0); }
-            60% { clip: rect(48px, 9999px, 2px, 0); }
-            80% { clip: rect(96px, 9999px, 86px, 0); }
-            100% { clip: rect(35px, 9999px, 145px, 0); }
-        }
-        @keyframes glitch-anim-2 {
-            0% { clip: rect(65px, 9999px, 100px, 0); }
-            20% { clip: rect(3px, 9999px, 5px, 0); }
-            40% { clip: rect(110px, 9999px, 14px, 0); }
-            60% { clip: rect(10px, 9999px, 80px, 0); }
-            80% { clip: rect(50px, 9999px, 20px, 0); }
-            100% { clip: rect(90px, 9999px, 65px, 0); }
-        }
-
-        /* Terminal Window Styling */
-        .terminal-window {
-            background-color: rgba(5, 10, 5, 0.95);
-            border: 1px solid var(--neon-green);
-            box-shadow: 0 0 30px rgba(0, 255, 0, 0.15);
-            backdrop-filter: blur(5px);
-        }
-        
-        .blinking-cursor {
-            animation: blink 1s step-end infinite;
-        }
-        @keyframes blink { 50% { opacity: 0; } }
-        
-        /* Hacker Button Styles */
-        .hacker-btn {
-            background: rgba(0, 20, 0, 0.6);
-            border: 1px solid var(--neon-green);
-            color: var(--neon-green);
-            transition: all 0.2s;
-            position: relative;
+            left: 0;
+            top: 0;
+            width: 0;
+            color: var(--neon-cyan);
             overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            font-size: 0.85rem;
-        }
-        .hacker-btn:hover {
-            background: var(--neon-green);
-            color: black;
-            box-shadow: 0 0 15px var(--neon-green);
-            transform: translateY(-2px);
-        }
-        .hacker-btn svg {
-            width: 18px;
-            height: 18px;
-            fill: currentColor;
-            transition: transform 0.2s;
-        }
-        .hacker-btn:hover svg {
-            transform: scale(1.1);
+            border-right: 2px solid var(--neon-cyan);
+            animation: sweep 4s linear infinite;
+            white-space: nowrap;
+            text-shadow: 0 0 15px var(--neon-cyan);
         }
 
-        /* --- EMAIL DECRYPTOR --- */
-        .email-decryptor {
-            background: rgba(0, 0, 0, 0.8);
-            border: 1px solid var(--neon-green);
-            color: var(--neon-green);
-            font-family: 'Fira Code', monospace;
-            padding: 1rem;
+        @keyframes sweep {
+            0% { width: 0; opacity: 0; }
+            10% { opacity: 1; }
+            40% { width: 100%; }
+            70% { width: 100%; opacity: 1; }
+            80% { opacity: 0; }
+            100% { width: 100%; opacity: 0; }
+        }
+
+        .glitch-logo {
+            filter: drop-shadow(0 0 10px var(--neon-cyan));
+            animation: flicker 3s infinite;
+        }
+
+        @keyframes flicker {
+            0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% { opacity: 1; }
+            20%, 24%, 55% { opacity: 0.3; }
+        }
+
+        .decrypt-box {
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px dashed var(--neon-cyan);
             cursor: pointer;
-            position: relative;
-            overflow: hidden;
-            transition: all 0.3s ease;
+            transition: all 0.3s;
         }
-        .email-decryptor:hover {
-            background: rgba(0, 255, 0, 0.1);
-            box-shadow: inset 0 0 20px rgba(0, 255, 0, 0.2);
-        }
-        .email-decryptor::before {
-            content: ">> CLICK_TO_COPY_ID";
-            position: absolute;
-            top: 2px;
-            left: 4px;
-            font-size: 0.6rem;
-            opacity: 0.5;
-            color: var(--neon-green);
-        }
-        .email-text {
-            font-size: 1.1rem;
-            font-weight: bold;
-            display: block;
-            margin-top: 0.5rem;
-            letter-spacing: 1px;
-        }
-        @keyframes copyFlash {
-            0% { background-color: var(--neon-green); color: black; }
-            100% { background-color: rgba(0,0,0,0.8); color: var(--neon-green); }
-        }
-        .copied-flash {
-            animation: copyFlash 0.5s ease-out;
+        .decrypt-box:hover {
+            background: rgba(0, 242, 255, 0.1);
+            border-style: solid;
+            box-shadow: inset 0 0 15px rgba(0, 242, 255, 0.2);
         }
 
-        /* --- LOADING BAR ANIMATION (COMING SOON) --- */
-        .loading-stripe {
-            background: repeating-linear-gradient(
-                45deg,
-                var(--neon-green),
-                var(--neon-green) 10px,
-                #000 10px,
-                #000 20px
-            );
-            animation: moveStripe 1s linear infinite;
+        .cyber-btn {
+            position: relative;
+            padding: 10px 20px;
+            border: 1px solid var(--neon-cyan);
+            color: var(--neon-cyan);
+            text-transform: uppercase;
+            overflow: hidden;
+            transition: 0.3s;
+            background: transparent;
         }
-        @keyframes moveStripe {
-            0% { background-position: 0 0; }
-            100% { background-position: 28px 0; }
+        .cyber-btn:hover {
+            background: var(--neon-cyan);
+            color: black;
+            box-shadow: 0 0 20px var(--neon-cyan);
         }
-        
-        /* Image blend mode */
-        .blend-mode-screen {
-            mix-blend-mode: lighten;
+
+        .scanline {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, transparent 50%, rgba(0, 242, 255, 0.02) 50%);
+            background-size: 100% 4px;
+            position: fixed;
+            pointer-events: none;
+            z-index: 20;
+        }
+
+        /* Loader Overlay */
+        #loader {
+            position: fixed;
+            inset: 0;
+            background: #000;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.5s ease-out;
         }
     </style>
 </head>
-<body class="flex items-center justify-center min-h-screen relative py-10">
+<body class="flex flex-col items-center justify-center min-h-screen">
 
-    <canvas id="matrix-canvas"></canvas>
-    <div class="scanlines"></div>
-
-    <main class="relative z-20 w-full max-w-4xl px-4">
-        
-        <div class="terminal-window rounded-t-lg p-2 flex justify-between items-center border-b border-green-900 bg-green-900/20">
-            <div class="flex gap-2 ml-2">
-                <div class="w-3 h-3 rounded-full bg-red-500/80"></div>
-                <div class="w-3 h-3 rounded-full bg-yellow-500/80"></div>
-                <div class="w-3 h-3 rounded-full bg-green-500/80"></div>
-            </div>
-            <div class="text-xs uppercase tracking-widest opacity-70 mr-2 font-mono">root@leakhunter-x:~/deployment</div>
+    <div id="loader">
+        <div class="mono text-cyan-400 text-sm mb-4" id="loader-log">SYSTEM_INITIALIZING...</div>
+        <div class="w-64 h-1 bg-white/10 rounded-full overflow-hidden">
+            <div id="loader-bar" class="h-full bg-cyan-500 w-0 transition-all duration-100"></div>
         </div>
+    </div>
 
-        <div class="terminal-window border-t-0 p-6 md:p-12 rounded-b-lg">
-            
-            <div class="flex flex-col md:flex-row items-center gap-6 mb-10">
-                <div class="relative shrink-0">
-                    <div class="absolute inset-0 bg-cyan-500/20 blur-xl rounded-full"></div>
-                    <img src="logo1.png" alt="LeakHunterX Logo" class="relative w-32 md:w-40 blend-mode-screen hover:scale-105 transition duration-500">
-                </div>
+    <canvas id="data-canvas"></canvas>
+    <div class="scanline"></div>
+
+    <main class="relative z-10 w-full max-w-5xl px-6 py-12">
+        
+        <div class="flex flex-col md:flex-row items-center gap-8 mb-4">
+            <div class="relative group">
+                <img src="logo1.png" alt="LeakHunterX" class="w-32 md:w-48 glitch-logo relative z-10 transition-transform duration-500 group-hover:scale-110">
+                <div class="absolute inset-0 bg-cyan-500/20 blur-3xl rounded-full animate-pulse"></div>
+            </div>
+
+            <div class="text-center md:text-left">
+                <h1 class="text-5xl md:text-7xl font-bold tracking-tighter text-white uppercase">
+                    LEAKHUNTER<span class="text-cyan-400">X</span>
+                </h1>
                 
-                <div class="text-center md:text-left w-full">
-                    <div class="glitch-wrapper">
-                        <h1 class="glitch leading-none" data-text="LeakHunterX">LeakHunterX</h1>
-                    </div>
-                    <div class="text-sm mt-2 opacity-80 font-mono text-green-400/80">
-                         > v1.0_BETA // STATUS: <span class="text-yellow-400 font-bold animate-pulse">COMING_SOON</span>
-                    </div>
-
-                    <div class="mt-6 border border-green-500/30 p-1 bg-black/50 rounded max-w-md mx-auto md:mx-0">
-                        <div class="h-3 bg-green-900/30 relative overflow-hidden rounded-sm">
-                            <div class="absolute top-0 left-0 h-full w-[65%] loading-stripe opacity-80"></div>
-                        </div>
-                        <div class="flex justify-between text-[10px] md:text-xs font-mono mt-1 text-green-400/60 uppercase tracking-wider">
-                            <span>System_Initialization</span>
-                            <span class="animate-pulse">Loading_Modules...</span>
-                        </div>
-                    </div>
-
+                <div class="mt-4 mvp-container">
+                    <div class="mvp-text">MVP_LAUNCH_IMMINENT</div>
                 </div>
-            </div>
-
-            <div class="space-y-8">
-                <p class="text-lg md:text-xl leading-relaxed text-green-100 border-l-4 border-green-500/50 pl-6 py-1">
-                    <strong class="text-green-400">LeakHunterX</strong> is an automated SaaS platform designed to hunt down website leaks and security gaps in real-time.
-                </p>
-
-                <div class="space-y-4 font-mono text-sm md:text-base mt-6 bg-black/40 p-6 rounded border border-green-500/20 shadow-inner">
-                    <div class="flex items-start gap-3 group">
-                        <span class="text-green-500 font-bold shrink-0 group-hover:translate-x-1 transition">></span>
-                        <div>
-                            <strong class="text-cyan-300">AI-Automated Scanning:</strong> 
-                            <span class="opacity-80 text-gray-300">Eliminates manual oversight by identifying leaks across the web instantly.</span>
-                        </div>
-                    </div>
-                    <div class="flex items-start gap-3 group">
-                        <span class="text-green-500 font-bold shrink-0 group-hover:translate-x-1 transition">></span>
-                        <div>
-                            <strong class="text-cyan-300">Proactive Threat Hunting:</strong> 
-                            <span class="opacity-80 text-gray-300">Moves beyond firewalls to find exposed data before exploitation.</span>
-                        </div>
-                    </div>
-                    <div class="flex items-start gap-3 group">
-                        <span class="text-green-500 font-bold shrink-0 group-hover:translate-x-1 transition">></span>
-                        <div>
-                            <strong class="text-cyan-300">Intelligent Insights:</strong> 
-                            <span class="opacity-80 text-gray-300">Actionable intelligence reducing response times and mitigating risk.</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="mt-8 font-mono text-lg bg-black/60 p-2 rounded">
-                    <span class="text-green-500">root@user:~$</span> <span id="typing-text" class="text-gray-100"></span><span class="blinking-cursor text-green-500">_</span>
-                </div>
-
-                <div class="mt-10 border-t border-green-900/50 pt-6">
-                    <div class="text-xs font-mono uppercase tracking-widest text-green-500/60 mb-4 text-center sm:text-left">
-                        [ ESTABLISH_SECURE_UPLINK ]
-                    </div>
-                    
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-                        
-                        <div class="email-decryptor sm:col-span-2 lg:col-span-4 text-center group" id="email-box">
-                             <span class="email-text" id="email-display" data-value="tantralogicai@gmail.com">tantralogicai@gmail.com</span>
-                        </div>
-
-                        <a href="https://www.linkedin.com/company/tantralogic-ai/" target="_blank" class="hacker-btn py-3">
-                            <svg viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
-                            <span>LinkedIn</span>
-                        </a>
-
-                        <a href="https://x.com/Tantralogi35239" target="_blank" class="hacker-btn py-3">
-                            <svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-                            <span>X</span>
-                        </a>
-
-                        <a href="https://www.instagram.com/tantralogic_ai/" target="_blank" class="hacker-btn py-3">
-                            <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
-                            <span>Insta</span>
-                        </a>
-
-                        <a href="https://www.facebook.com/profile.php?id=61585960048396" target="_blank" class="hacker-btn py-3">
-                            <svg viewBox="0 0 24 24"><path d="M9 8h-3v4h3v12h5v-12h3.642l.358-4h-4v-1.667c0-.955.192-1.333 1.115-1.333h2.885v-5h-3.808c-3.596 0-5.192 1.583-5.192 4.615v3.385z"/></svg>
-                            <span>FB</span>
-                        </a>
-
-                    </div>
-                </div>
-
             </div>
         </div>
-        
-        <div class="text-center mt-4 font-mono text-xs text-green-900/60 uppercase">
-            © 2026 Tantralogic AI // Secure Connection Established
+
+        <div class="w-full max-w-md mx-auto md:mx-0 mb-12 flex items-center gap-4">
+            <div class="flex-1 h-1 bg-white/10 rounded-full overflow-hidden">
+                <div class="h-full bg-cyan-500 shadow-[0_0_10px_#00f2ff]" style="width: 88%;"></div>
+            </div>
+            <div class="mono text-[10px] text-cyan-400 animate-pulse uppercase">88%_Compiled_Final_Build</div>
+        </div>
+
+        <div class="glass-panel rounded-2xl overflow-hidden mb-8">
+            <div class="bg-white/5 px-6 py-3 border-b border-white/10 flex justify-between items-center">
+                <div class="flex gap-2">
+                    <div class="w-2 h-2 rounded-full bg-cyan-500 animate-ping"></div>
+                    <div class="text-[10px] mono text-white/40 uppercase tracking-widest">Breach_Monitor_v1.0</div>
+                </div>
+                <div class="text-[10px] mono text-cyan-400/60 uppercase">Node_Status: <span class="text-green-400">Active</span></div>
+            </div>
+
+            <div class="p-8 md:p-12">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+                    <div class="space-y-6">
+                        <p class="text-xl text-cyan-100/90 leading-relaxed border-l-2 border-cyan-500 pl-6">
+                            Autonomous <span class="font-bold text-cyan-400">Security Intelligence</span> 
+                            engineered by <span class="text-white font-bold">Tantralogic AI</span>.
+                        </p>
+                        
+                        <div class="space-y-4 text-sm opacity-80">
+                            <div class="flex gap-3 items-start">
+                                <span class="text-cyan-400 font-bold mt-1">>></span>
+                                <div><b class="text-white">Pattern Recognition:</b> AI-driven identification of sensitive company signatures.</div>
+                            </div>
+                            <div class="flex gap-3 items-start">
+                                <span class="text-cyan-400 font-bold mt-1">>></span>
+                                <div><b class="text-white">Surface Scan:</b> Continuous monitoring across public and dark-web repositories.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-black/40 rounded-xl p-6 border border-white/5 flex flex-col justify-center">
+                        <div class="text-xs text-cyan-500/50 mb-4 mono">[ SYSTEM_LOGS ]</div>
+                        <div class="mono text-sm space-y-2">
+                            <div class="text-green-400">$ ./leakhunter --monitor --all</div>
+                            <div class="text-white/60">Initializing neural nodes...</div>
+                            <div class="text-white/40 italic" id="type-target"></div>
+                            <div class="flex justify-between items-center mt-6 pt-4 border-t border-white/5">
+                                <span class="text-[10px] uppercase tracking-tighter">Shield Level:</span>
+                                <span class="text-cyan-500 font-bold">AES-256 Enabled</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-12">
+                    <div class="decrypt-box p-6 rounded-xl text-center group" id="email-trigger">
+                        <div class="text-[10px] text-cyan-400/50 mb-2 tracking-[0.4em]">SECURE_UPLINK_CHANNEL</div>
+                        <span class="text-xl md:text-2xl font-bold tracking-widest text-white mono" id="email-text" data-value="support@leakhunterx.com">support@leakhunterx.com</span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
+                    <a href="https://www.linkedin.com/company/tantralogic-ai/" target="_blank" class="cyber-btn text-center text-xs">LinkedIn</a>
+                    <a href="https://x.com/Tantralogi35239" target="_blank" class="cyber-btn text-center text-xs">X_Global</a>
+                    <a href="https://www.instagram.com/tantralogic_ai/" target="_blank" class="cyber-btn text-center text-xs">Instagram</a>
+                    <a href="https://www.facebook.com/profile.php?id=61585960048396" target="_blank" class="cyber-btn text-center text-xs">Facebook</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center text-[10px] text-white/20 tracking-[0.5em] uppercase">
+            © 2026 Tantralogic AI // Project: LeakHunterX
         </div>
     </main>
 
     <script>
-        const canvas = document.getElementById('matrix-canvas');
+        /** BACKGROUND CANVAS - Matrix & Neural Web **/
+        const canvas = document.getElementById('data-canvas');
         const ctx = canvas.getContext('2d');
+        let width, height, columns;
+        const fontSize = 14;
+        const chars = "01ABCDEF"; 
+        let drops = [];
+        let particles = [];
+        const mouse = { x: null, y: null };
 
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
+        window.addEventListener('mousemove', (e) => { mouse.x = e.x; mouse.y = e.y; });
 
-        const katakana = 'アァカサタナハマヤャラワガザダバパイィキシチニヒミリヂビピウゥクスツヌフムユュルグズブヅプエェケセテネヘメレゲゼデベペオォコソトノホモヨョロヲゴゾドボポ1234567890';
-        const latin = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-        const nums = '0123456789';
-        const alphabet = katakana + latin + nums;
-
-        const fontSize = 16;
-        const columns = canvas.width/fontSize;
-
-        const rainDrops = [];
-
-        for( let x = 0; x < columns; x++ ) {
-            rainDrops[x] = 1;
+        function init() {
+            width = window.innerWidth;
+            height = window.innerHeight;
+            canvas.width = width;
+            canvas.height = height;
+            columns = Math.floor(width / fontSize);
+            drops = Array(columns).fill(1);
+            particles = [];
+            for(let i = 0; i < 60; i++) {
+                particles.push({
+                    x: Math.random() * width,
+                    y: Math.random() * height,
+                    vx: (Math.random() - 0.5) * 0.4,
+                    vy: (Math.random() - 0.5) * 0.4
+                });
+            }
         }
 
-        const draw = () => {
-            ctx.fillStyle = 'rgba(5, 5, 5, 0.05)';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        function draw() {
+            ctx.fillStyle = 'rgba(2, 2, 5, 0.15)';
+            ctx.fillRect(0, 0, width, height);
 
-            ctx.fillStyle = '#0F0';
             ctx.font = fontSize + 'px monospace';
+            for (let i = 0; i < drops.length; i++) {
+                const text = chars.charAt(Math.floor(Math.random() * chars.length));
+                const chance = Math.random();
+                if (chance > 0.99) ctx.fillStyle = '#fff'; 
+                else if (chance > 0.90) ctx.fillStyle = '#00f2ff'; 
+                else ctx.fillStyle = 'rgba(0, 242, 255, 0.1)'; 
 
-            for(let i = 0; i < rainDrops.length; i++) {
-                const text = alphabet.charAt(Math.floor(Math.random() * alphabet.length));
-                if(Math.random() > 0.98) {
-                      ctx.fillStyle = '#0ff'; 
-                } else {
-                      ctx.fillStyle = '#0f0'; 
-                }
-                ctx.fillText(text, i*fontSize, rainDrops[i]*fontSize);
-                if(rainDrops[i]*fontSize > canvas.height && Math.random() > 0.975){
-                    rainDrops[i] = 0;
-                }
-                rainDrops[i]++;
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+                if (drops[i] * fontSize > height && Math.random() > 0.975) drops[i] = 0;
+                drops[i]++;
             }
-        };
 
-        setInterval(draw, 30);
+            particles.forEach(p => {
+                p.x += p.vx; p.y += p.vy;
+                if(p.x < 0 || p.x > width) p.vx *= -1;
+                if(p.y < 0 || p.y > height) p.vy *= -1;
+                ctx.fillStyle = 'rgba(0, 242, 255, 0.3)';
+                ctx.beginPath(); ctx.arc(p.x, p.y, 1, 0, Math.PI * 2); ctx.fill();
 
-        window.addEventListener('resize', () => {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        });
-
-        const textToType = "./initialize_launch_sequence.sh";
-        let index = 0;
-        const typeTarget = document.getElementById('typing-text');
-        
-        function typeWriter() {
-            if (index < textToType.length) {
-                typeTarget.innerHTML += textToType.charAt(index);
-                index++;
-                setTimeout(typeWriter, 80);
-            }
-        }
-        setTimeout(typeWriter, 1200); 
-
-        // --- HACKER EMAIL DECRYPT & COPY EFFECT ---
-        const emailBox = document.getElementById('email-box');
-        const emailDisplay = document.getElementById('email-display');
-        const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*";
-        let interval = null;
-
-        emailBox.onmouseover = event => {  
-            let iteration = 0;
-            clearInterval(interval);
-            
-            interval = setInterval(() => {
-                emailDisplay.innerText = emailDisplay.innerText
-                .split("")
-                .map((letter, index) => {
-                    if(index < iteration) {
-                        return emailDisplay.dataset.value[index];
-                    }
-                    return letters[Math.floor(Math.random() * 26)]
-                })
-                .join("");
-                
-                if(iteration >= emailDisplay.dataset.value.length){ 
-                    clearInterval(interval);
+                let dx = mouse.x - p.x;
+                let dy = mouse.y - p.y;
+                let dist = Math.sqrt(dx*dx + dy*dy);
+                if(dist < 180) {
+                    ctx.strokeStyle = `rgba(0, 242, 255, ${0.4 - dist/180})`;
+                    ctx.lineWidth = 0.5;
+                    ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(mouse.x, mouse.y); ctx.stroke();
                 }
-                iteration += 1 / 3;
-            }, 30);
-        }
-
-        emailBox.onclick = () => {
-            const email = emailDisplay.dataset.value;
-            navigator.clipboard.writeText(email).then(() => {
-                const originalText = emailDisplay.innerText;
-                emailDisplay.innerText = ">> COPIED_TO_CLIPBOARD <<";
-                emailBox.classList.add("copied-flash");
-                
-                setTimeout(() => {
-                    emailDisplay.innerText = originalText;
-                    emailBox.classList.remove("copied-flash");
-                }, 1500);
             });
         }
+
+        window.addEventListener('resize', init);
+        init();
+        setInterval(draw, 40);
+
+        /** LOADER SEQUENCE **/
+        const loader = document.getElementById('loader');
+        const loaderBar = document.getElementById('loader-bar');
+        const loaderLog = document.getElementById('loader-log');
+        const logs = ["GET /boot_sequence", "Accessing_Neural_Cores...", "Protocol: AES-256", "LeakHunterX_READY"];
+        let logIdx = 0;
+
+        function runLoader() {
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += Math.random() * 12;
+                if (progress > 100) progress = 100;
+                loaderBar.style.width = progress + "%";
+                
+                if (progress % 20 < 5) {
+                    loaderLog.innerText = logs[logIdx];
+                    logIdx = (logIdx + 1) % logs.length;
+                }
+
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        loader.style.opacity = "0";
+                        setTimeout(() => loader.style.display = "none", 500);
+                    }, 500);
+                }
+            }, 120);
+        }
+        window.onload = runLoader;
+
+        /** CONSOLE TYPING EFFECT **/
+        const typeStrings = ["Scanning subdomains...", "Mapping neural routes...", "Threat detected: 0", "Optimizing Shield..."];
+        let stringIdx = 0; let charIdx = 0;
+        const target = document.getElementById('type-target');
+        function type() {
+            if (charIdx < typeStrings[stringIdx].length) {
+                target.innerHTML += typeStrings[stringIdx].charAt(charIdx);
+                charIdx++; setTimeout(type, 80);
+            } else {
+                setTimeout(() => {
+                    target.innerHTML = ""; charIdx = 0;
+                    stringIdx = (stringIdx + 1) % typeStrings.length; type();
+                }, 1500);
+            }
+        }
+        type();
+
+        /** EMAIL DECRYPTOR EFFECT **/
+        const emailBox = document.getElementById('email-trigger');
+        const emailText = document.getElementById('email-text');
+        const originalValue = emailText.dataset.value;
+        const scrambleChars = "X01_#@&$%";
+        
+        emailBox.onmouseenter = () => {
+            let iteration = 0;
+            const interval = setInterval(() => {
+                emailText.innerText = emailText.innerText.split("").map((char, index) => {
+                    if (index < iteration) return originalValue[index];
+                    return scrambleChars[Math.floor(Math.random() * scrambleChars.length)];
+                }).join("");
+                if (iteration >= originalValue.length) clearInterval(interval);
+                iteration += 1 / 3;
+            }, 30);
+        };
+        
+        emailBox.onclick = () => {
+            navigator.clipboard.writeText(originalValue);
+            emailText.innerText = ">> UPLINK_COPIED <<";
+            setTimeout(() => { emailText.innerText = originalValue; }, 1000);
+        };
     </script>
 </body>
-
 </html>
