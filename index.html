@@ -46,7 +46,7 @@
             box-shadow: 0 0 40px rgba(0, 0, 0, 0.8);
         }
 
-        /* MOBILE FIXES */
+        /* --- THE MOBILE EMAIL WRAP FIX --- */
         .decrypt-box {
             background: rgba(0, 0, 0, 0.6);
             border: 1px dashed var(--neon-cyan);
@@ -57,16 +57,18 @@
             box-sizing: border-box;
             display: block;
             text-decoration: none;
+            padding: 1.5rem 0.5rem; /* Tighter side padding to give text room */
         }
 
         #email-text {
             display: block;
-            word-wrap: break-word;
-            overflow-wrap: break-word;
-            word-break: break-all; 
-            font-size: clamp(0.7rem, 4.2vw, 1.4rem); /* Responsive font scaling */
+            white-space: nowrap; /* FORCES text to stay on one line */
+            overflow: hidden;
+            text-overflow: clip; 
+            /* Fluid font size: starts at 0.65rem on small screens, grows to 1.4rem on desktop */
+            font-size: clamp(0.65rem, 4.3vw, 1.4rem); 
             line-height: 1.4;
-            padding: 0 8px;
+            letter-spacing: -0.03em; /* Tightens letters slightly for mobile fit */
         }
 
         .cyber-btn {
@@ -100,6 +102,42 @@
             align-items: center;
         }
 
+        /* MVP Launch text effect */
+        .mvp-container {
+            position: relative;
+            display: inline-block;
+        }
+
+        .mvp-text {
+            font-size: 1.1rem;
+            font-weight: 700;
+            letter-spacing: 0.3em;
+            color: rgba(0, 242, 255, 0.2);
+            text-transform: uppercase;
+        }
+
+        .mvp-text::after {
+            content: "MVP_LAUNCH_IMMINENT";
+            position: absolute;
+            left: 0; top: 0;
+            width: 0;
+            color: var(--neon-cyan);
+            overflow: hidden;
+            border-right: 2px solid var(--neon-cyan);
+            animation: sweep 4s linear infinite;
+            white-space: nowrap;
+            text-shadow: 0 0 10px var(--neon-cyan);
+        }
+
+        @keyframes sweep {
+            0% { width: 0; opacity: 0; }
+            10% { opacity: 1; }
+            40% { width: 100%; }
+            70% { width: 100%; opacity: 1; }
+            80% { opacity: 0; }
+            100% { width: 100%; opacity: 0; }
+        }
+
         .glitch-logo {
             filter: drop-shadow(0 0 10px var(--neon-cyan));
             animation: flicker 3s infinite;
@@ -114,7 +152,7 @@
 <body class="flex flex-col items-center justify-center min-h-screen">
 
     <div id="loader">
-        <div class="mono text-cyan-400 text-[10px] mb-4" id="loader-log">NEURAL_SYNC_INITIALIZING...</div>
+        <div class="mono text-cyan-400 text-[10px] mb-4" id="loader-log">SYSTEM_INITIALIZING...</div>
         <div class="w-48 h-1 bg-white/10 rounded-full overflow-hidden">
             <div id="loader-bar" class="h-full bg-cyan-500 w-0 transition-all duration-100"></div>
         </div>
@@ -127,18 +165,29 @@
         <div class="flex flex-col md:flex-row items-center gap-6 mb-8">
             <img src="logo1.png" alt="LeakHunterX" class="w-24 md:w-48 glitch-logo relative z-10">
             <div class="text-center md:text-left">
-                <h1 class="text-3xl md:text-6xl font-bold tracking-tighter text-white uppercase">
+                <h1 class="text-4xl md:text-6xl font-bold tracking-tighter text-white uppercase mb-2">
                     LEAKHUNTER<span class="text-cyan-400">X</span>
                 </h1>
+                <div class="mvp-container">
+                    <div class="mvp-text">MVP_LAUNCH_IMMINENT</div>
+                </div>
             </div>
+        </div>
+
+        <div class="w-full max-w-md mx-auto md:mx-0 mb-8 flex items-center gap-4">
+            <div class="flex-1 h-1 bg-white/10 rounded-full overflow-hidden">
+                <div class="h-full bg-cyan-500 shadow-[0_0_10px_#00f2ff]" style="width: 88%;"></div>
+            </div>
+            <div class="mono text-[10px] text-cyan-400 animate-pulse uppercase">88%_Compiled</div>
         </div>
 
         <div class="glass-panel rounded-2xl overflow-hidden mb-8">
             <div class="bg-white/5 px-4 py-3 border-b border-white/10 flex justify-between items-center">
                 <div class="flex gap-2 items-center">
                     <div class="w-2 h-2 rounded-full bg-cyan-500 animate-ping"></div>
-                    <div class="text-[9px] mono text-white/40 uppercase">Breach_Monitor_v1.0_Stable</div>
+                    <div class="text-[9px] mono text-white/40 uppercase">Breach_Monitor_v1.0</div>
                 </div>
+                <div class="text-[9px] mono text-cyan-400/60 uppercase">Node: <span class="text-green-400">Active</span></div>
             </div>
 
             <div class="p-6 md:p-12">
@@ -153,7 +202,7 @@
                         </div>
                     </div>
 
-                    <div class="bg-black/40 rounded-xl p-5 border border-white/5 mono text-xs">
+                    <div class="bg-black/40 rounded-xl p-5 border border-white/5 mono text-xs min-h-[140px]">
                         <div class="text-cyan-500/50 mb-2">[ SYSTEM_LOGS ]</div>
                         <div class="text-green-400">$ ./leakhunter --monitor --all</div>
                         <div class="text-white/60">Initializing neural nodes...</div>
@@ -166,9 +215,9 @@
                 </div>
 
                 <div class="mt-10 w-full flex justify-center">
-                    <a href="mailto:support@leakhunterx.com" class="decrypt-box p-4 md:p-8 rounded-xl text-center group" id="email-trigger">
+                    <a href="mailto:support@leakhunterx.com" class="decrypt-box rounded-xl text-center group" id="email-trigger">
                         <div class="text-[9px] md:text-[10px] text-cyan-400/50 mb-3 tracking-[0.3em] uppercase">SECURE_UPLINK_CHANNEL</div>
-                        <span class="font-bold tracking-widest text-white mono" 
+                        <span class="font-bold text-white mono" 
                               id="email-text" 
                               data-value="support@leakhunterx.com">
                             support@leakhunterx.com
@@ -191,7 +240,7 @@
     </main>
 
     <script>
-        /** INTERACTIVE NEURAL MATRIX **/
+        /** INTERACTIVE NEURAL MATRIX RAIN **/
         const canvas = document.getElementById('data-canvas');
         const ctx = canvas.getContext('2d');
         let width, height, columns, drops = [];
@@ -239,7 +288,7 @@
                     ctx.fillStyle = '#fff';
                     ctx.shadowBlur = 15;
                     ctx.shadowColor = '#00f2ff';
-                    x += (dx / distance) * -6; // Displacement
+                    x += (dx / distance) * -6; // Interactive displacement
                 } else {
                     ctx.fillStyle = `rgba(0, 242, 255, ${drops[i].opacity})`;
                     ctx.shadowBlur = 0;
@@ -254,7 +303,7 @@
         init();
         setInterval(draw, 33);
 
-        /** BOOT LOADER **/
+        /** BOOT LOADER ANIMATION **/
         const loader = document.getElementById('loader');
         const loaderBar = document.getElementById('loader-bar');
         window.onload = () => {
@@ -270,7 +319,7 @@
             }, 100);
         };
 
-        /** EMAIL SCRAMBLER **/
+        /** EMAIL SCRAMBLE EFFECT **/
         const emailBox = document.getElementById('email-trigger');
         const emailText = document.getElementById('email-text');
         const originalValue = emailText.dataset.value;
@@ -294,7 +343,7 @@
             setTimeout(() => emailText.innerText = originalValue, 1200);
         };
 
-        /** TYPE EFFECT **/
+        /** CONSOLE TYPING EFFECT **/
         const target = document.getElementById('type-target');
         const texts = ["Mapping nodes...", "Tracing leaks...", "Shield optimized."];
         let sIdx = 0, cIdx = 0;
